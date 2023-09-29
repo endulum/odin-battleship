@@ -4,7 +4,7 @@
   "description": "Implementation of the game 'Battleship'.",
   "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "build": "webpack",
     "start": "webpack serve --open"
   },
@@ -13,6 +13,7 @@
   "license": "ISC",
   "devDependencies": {
     "html-webpack-plugin": "^5.5.3",
+    "jest": "^29.7.0",
     "webpack": "^5.88.2",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^4.15.1"

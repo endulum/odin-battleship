@@ -28,8 +28,12 @@ module.exports = class Board {
     });
   }
 
-  random() {
-    return Math.ceil(Math.random() * 9);
+  randomlyPlaceShips() {
+    this.#ships.forEach(ship => {
+      while (this.#occupiedCells[ship.name].length === 0) {
+        this.#occupiedCells[ship.name] = this.placeShip(this.random(), this.random(), ship, this.randomOrientation());
+      }
+    });
   }
 
   placeShip(x, y, ship, orientation = 'horizontal') {
@@ -48,6 +52,7 @@ module.exports = class Board {
         }
       }
     }
+    if (placedCells.some(cell => this.isCellOccupied(cell))) return [];
     return placedCells;
   }
 
@@ -58,6 +63,38 @@ module.exports = class Board {
   print() {
     let toPrint = ``;
 
+    this.#cells.forEach((row, rowIndex) => {
+      row.forEach((column, columnIndex) => {
+        if (this.isCellOccupied([rowIndex, columnIndex])) {
+          toPrint += `■ `;
+        } else toPrint += `□ `;
+      });
+      toPrint += `\n`;
+    });
+
     console.log(toPrint);
+  }
+
+  random() {
+    return Math.ceil(Math.random() * 9);
+  }
+
+  randomOrientation() {
+    return (Math.floor(Math.random() * 2) == 1 ? 'vertical' : 'horizontal')
+  }
+
+  compareCoords(coord1, coord2) {
+    return (
+      (coord1[0] === coord2[0]) &&
+      (coord1[1] === coord2[1])
+    )
+  }
+
+  isCellOccupied(coords) {
+    return this.#ships.some(ship => {
+      return this.#occupiedCells[ship.name].some(coord => {
+        return this.compareCoords(coords, coord);
+      });
+    });
   }
 }

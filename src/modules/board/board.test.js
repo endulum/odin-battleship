@@ -21,7 +21,6 @@ describe('board functions', () => {
   describe('ship behavior', () => {
     test('initialized with all new ships', () => {
       // console.log(board.occupiedCells);
-      // board.print();
       expect(board.ships.map(ship => [ship.name, ship.length, ship.hits])).toEqual([
         ['Carrier', 5, 0],
         ['Battleship', 4, 0],
@@ -31,16 +30,22 @@ describe('board functions', () => {
       ]); 
     });
 
-    test('can place a ship horizontally', () => {
-      expect(board.placeShip(3, 3, new Ship('Destroyer', 3))).toEqual([[3, 3], [4, 3], [5, 3]]);
+    test('able to place a ship horizontally', () => {
+      expect(board.placeShip(1, 0, new Ship('Destroyer', 3))).toEqual([[1, 0], [2, 0], [3, 0]]);
     });
 
-    test('can place a ship vertically', () => {
-      expect(board.placeShip(3, 3, new Ship('Destroyer', 3), 'vertical')).toEqual([[3, 3], [3, 4], [3, 5]]);
+    test('able to place a ship vertically', () => {
+      expect(board.placeShip(0, 1, new Ship('Destroyer', 3), 'vertical')).toEqual([[0, 1], [0, 2], [0, 3]]);
     });
 
-    test('prevented from placing a ship out of bounds', () => {
+    test('not able to place a ship out of bounds', () => {
       expect(board.placeShip(8, 8, new Ship('Destroyer', 3))).toEqual([]);
     });
-  })
+
+    test('when randomly placing ships, amount of occupied cells is exactly 17', () => {
+      board.randomlyPlaceShips();
+      board.print();
+      expect(Object.keys(board.occupiedCells).reduce((acc, curr) => acc + board.occupiedCells[curr].length, 0)).toBe(17);
+    });
+  });
 });

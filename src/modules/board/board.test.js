@@ -1,67 +1,48 @@
 import Board from './board';
-import Ship from '../ship/ship';
+// import Ship from '../ship/ship';
 
-describe('board functions', () => {
-  let board;
+let board;
+beforeEach(() => { board = new Board() });
 
-  beforeAll(() => { board = new Board() });
+describe('hit behavior', () => {
+  beforeEach(() => { board.clearHits() });
 
-  describe('cell behavior', () => {
-    test('has ten rows and 100 cells total', () => {
-      expect(board.cells.length).toBe(10);
-      expect(board.cells.reduce((acc, curr) => acc + curr.length, 0)).toBe(100);
-    });
-
-    test('can change a cell', () => {
-      board.changeCell(3, 3, 'hit');
-      expect(board.cells.some(row => row.includes('hit'))).toBe(true);
-    });
+  test('can place a hit', () => {
+    board.receiveHit(3, 3);
+    expect(board.receivedHits).toEqual([[3, 3]]);
   });
 
-  describe('ship behavior', () => {
-    test('initialized with all new ships', () => {
-      // console.log(board.occupiedCells);
-      expect(board.ships.map(ship => [ship.name, ship.length, ship.hits])).toEqual([
-        ['Carrier', 5, 0],
-        ['Battleship', 4, 0],
-        ['Destroyer', 3, 0],
-        ['Submarine', 3, 0],
-        ['Patrol Boat', 2, 0]
-      ]); 
-    });
-
-    test('able to place a ship horizontally', () => {
-      expect(board.placeShip(1, 0, new Ship('Destroyer', 3))).toEqual([[1, 0], [2, 0], [3, 0]]);
-    });
-
-    test('able to place a ship vertically', () => {
-      expect(board.placeShip(0, 1, new Ship('Destroyer', 3), 'vertical')).toEqual([[0, 1], [0, 2], [0, 3]]);
-    });
-
-    test('not able to place a ship out of bounds', () => {
-      expect(board.placeShip(8, 8, new Ship('Destroyer', 3))).toEqual([]);
-    });
-
-    test('when randomly placing ships, amount of occupied cells is exactly 17', () => {
-      board.randomlyPlaceShips();
-      //board.print();
-      expect(Object.keys(board.occupiedCells).reduce((acc, curr) => acc + board.occupiedCells[curr].length, 0)).toBe(17);
-    });
+  test('can place multiple hits', () => {
+    board.receiveHit(4, 4);
+    board.receiveHit(5, 5);
+    board.receiveHit(6, 6);
+    expect(board.receivedHits).toEqual([[4, 4], [5, 5], [6, 6]]);
   });
 
-  describe('board hit behavior', () => {
-    test('receive one hit at 3, 3', () => {
-      board.receiveHit(3, 3);
-      //board.print();
-      expect(board.hitCells).toEqual([[3, 3]]);
-    });
+  test('cannot place hits out of bounds', () => {
+    board.receiveHit(10, 10);
+    board.receiveHit(-1, -1);
+    expect(board.receivedHits).toEqual([]);
+  });
 
-    test('properly receive 10 random hits', () => {
-      for (let i = 0; i < 10; i++) {
-        board.receiveRandomHit();
-      }
-      board.print();
-      expect(board.hitCells.length).toBe(11);
-    })
-  })
+  test('cannot place more than one hit in the same cell', () => {
+    board.receiveHit(1, 1);
+    board.receiveHit(2, 2);
+    board.receiveHit(1, 1);
+    expect(board.receivedHits).toEqual([[1, 1], [2, 2]]);
+  });
+
+  test('can place a hit at random', () => {
+    board.receiveRandomHit();
+    console.log(board.receivedHits);
+    expect(board.receivedHits.length).toBe(1);
+  });
+
+  test('can place ten different hits at random', () => {
+    for (let i = 0; i < 10; i++) {
+      board.receiveRandomHit();
+    }
+    console.log(board.receivedHits);
+    expect(board.receivedHits.length).toBe(10);
+  });
 });

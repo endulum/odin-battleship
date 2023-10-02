@@ -1,6 +1,6 @@
-const Ship = require('../ship/ship.js')
+import Ship from '../ship/ship';
 
-module.exports = class Board {
+class Board {
   #ships = [];
   get ships() { return this.#ships }
 
@@ -136,3 +136,5 @@ module.exports = class Board {
     })
   }
 }
+
+export default Board;

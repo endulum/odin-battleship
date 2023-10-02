@@ -1,5 +1,5 @@
-const Board = require('./board');
-const Ship = require('../ship/ship.js')
+import Board from './board';
+import Ship from '../ship/ship';
 
 describe('board functions', () => {
   let board;

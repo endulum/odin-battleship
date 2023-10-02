@@ -1,4 +1,4 @@
-module.exports = class Ship {
+class Ship {
   #name;
   get name() { return this.#name }
 
@@ -21,3 +21,5 @@ module.exports = class Ship {
     this.#length = parseInt(length);
   }
 }
+
+export default Ship;

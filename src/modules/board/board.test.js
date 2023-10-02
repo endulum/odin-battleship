@@ -44,8 +44,24 @@ describe('board functions', () => {
 
     test('when randomly placing ships, amount of occupied cells is exactly 17', () => {
       board.randomlyPlaceShips();
-      board.print();
+      //board.print();
       expect(Object.keys(board.occupiedCells).reduce((acc, curr) => acc + board.occupiedCells[curr].length, 0)).toBe(17);
     });
   });
+
+  describe('board hit behavior', () => {
+    test('receive one hit at 3, 3', () => {
+      board.receiveHit(3, 3);
+      //board.print();
+      expect(board.hitCells).toEqual([[3, 3]]);
+    });
+
+    test('properly receive 10 random hits', () => {
+      for (let i = 0; i < 10; i++) {
+        board.receiveRandomHit();
+      }
+      board.print();
+      expect(board.hitCells.length).toBe(11);
+    })
+  })
 });

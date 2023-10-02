@@ -60,14 +60,46 @@ module.exports = class Board {
     this.#cells[x].splice(y, 1, value);
   }
 
+  receiveRandomHit() {
+    let x = this.random();
+    let y = this.random();
+    while (this.isCellHit([x, y])) {
+      x = this.random();
+      y = this.random();
+    }
+    
+    this.receiveHit(x, y);
+  }
+
+  receiveHit(x, y) {
+    if (this.#hitCells.every(cell => !this.compareCoords(cell, [x, y])) && (
+      (x < 10) && (x >= 0) &&
+      (y < 10) && (y >= 0)
+    )) {
+      this.#hitCells.push([x, y]);
+      this.hitShip([x, y]);
+    }
+  }
+
+  hitShip(hitCoord) {
+    this.#ships.forEach(ship => {
+      if (this.#occupiedCells[ship.name].some(coords => this.compareCoords(coords, hitCoord))) {
+        ship.hit();
+      }
+    })
+  }
+
   print() {
     let toPrint = ``;
 
     this.#cells.forEach((row, rowIndex) => {
       row.forEach((column, columnIndex) => {
         if (this.isCellOccupied([rowIndex, columnIndex])) {
-          toPrint += `■ `;
-        } else toPrint += `□ `;
+          if (this.isCellHit([rowIndex, columnIndex])) toPrint += `x `;
+          else toPrint += `■ `;
+        } else {
+          if (this.isCellHit([rowIndex, columnIndex])) toPrint += `x `;else toPrint += `□ `;
+        }
       });
       toPrint += `\n`;
     });
@@ -96,5 +128,11 @@ module.exports = class Board {
         return this.compareCoords(coords, coord);
       });
     });
+  }
+
+  isCellHit(coords) {
+    return this.#hitCells.some(cell => {
+      return this.compareCoords(coords, cell);
+    })
   }
 }

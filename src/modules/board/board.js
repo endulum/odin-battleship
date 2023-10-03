@@ -69,7 +69,7 @@ class Board {
   }
 
   placeShipByName(shipName, x, y, orientation) {
-    const foundShip = this.#ships.find(ship => ship.name === shipName);
+    const foundShip = this.getShipByName(shipName);
     if (foundShip) {
       this.placeShip(foundShip, x, y, orientation);
     }
@@ -83,6 +83,13 @@ class Board {
     });
   }
 
+  damageShipByName(shipName) {
+    const foundShip = this.getShipByName(shipName);
+    if (foundShip) {
+      foundShip.hit();
+    }
+  }
+
   clearHits() { 
     this.#receivedHits = [];
   }
@@ -91,6 +98,14 @@ class Board {
     if (this.isValidToHit(x, y)) {
       this.#receivedHits.push([x, y]);
       this.#receivedHits.sort();
+
+      Object.keys(this.#shipCoordinates).forEach(ship => {
+        this.#shipCoordinates[ship].forEach(coord => {
+          if (this.compareCoordinates(coord, [x, y])) {
+            this.damageShipByName(ship);
+          }
+        })
+      })
     }
   }
 
@@ -131,6 +146,10 @@ class Board {
     return occupied;
   }
 
+  getShipByName(shipName) {
+    return this.#ships.find(ship => ship.name === shipName)
+  }
+
   isOccupied(x, y) {
     return this.getOccupied().some(occupiedCell => {
       return this.compareCoordinates(occupiedCell, [x, y]);
@@ -159,6 +178,10 @@ class Board {
 
   isValidToHit(x, y) {
     return !this.isHit(x, y) && this.isInBounds(x, y);
+  }
+
+  isAllSunk() {
+    return this.#ships.every(ship => ship.isSunk());
   }
 
   // print

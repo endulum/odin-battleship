@@ -1,5 +1,4 @@
 import Board from './board';
-// import Ship from '../ship/ship';
 
 let board;
 beforeEach(() => { board = new Board() });
@@ -86,3 +85,57 @@ describe('ship placement', () => {
     expect(board.getOccupied().length).toBe(17);
   });
 })
+
+describe('attack behavior', () => {
+  beforeEach(() => board.clearShips());
+
+  test('hit a Destroyer once', () => {
+    board.placeShipByName('Destroyer', 3, 3, 'vertical');
+    board.receiveHit(3, 3);
+    expect(board.getShipByName('Destroyer').hits).toBe(1);
+    expect(board.getShipByName('Destroyer').isSunk()).toBe(false);
+  });
+
+  test('cannot hit a Destroyer more than once in the same spot', () => {
+    board.placeShipByName('Destroyer', 3, 3, 'vertical');
+    board.receiveHit(3, 3);
+    board.receiveHit(3, 3);
+    board.receiveHit(3, 3);
+    expect(board.getShipByName('Destroyer').hits).toBe(1);
+    expect(board.getShipByName('Destroyer').isSunk()).toBe(false);
+  });
+
+  test('sink a Destroyer', () => {
+    board.placeShipByName('Destroyer', 3, 3, 'vertical');
+    board.receiveHit(3, 3);
+    board.receiveHit(3, 4);
+    board.receiveHit(3, 5);
+    expect(board.getShipByName('Destroyer').hits).toBe(3);
+    expect(board.getShipByName('Destroyer').isSunk()).toBe(true);
+  });
+
+  test('sink every ship', () => {
+    board.placeAllShipsRandomly();
+    expect(board.isAllSunk()).toBe(false);
+
+    const coordsToHit = board.getOccupied();
+    coordsToHit.forEach(coord => board.receiveHit(coord[0], coord[1]));
+
+    expect(board.getShipByName('Carrier').hits).toBe(5);
+    expect(board.getShipByName('Carrier').isSunk()).toBe(true);
+
+    expect(board.getShipByName('Battleship').hits).toBe(4);
+    expect(board.getShipByName('Battleship').isSunk()).toBe(true);
+
+    expect(board.getShipByName('Destroyer').hits).toBe(3);
+    expect(board.getShipByName('Destroyer').isSunk()).toBe(true);
+
+    expect(board.getShipByName('Submarine').hits).toBe(3);
+    expect(board.getShipByName('Submarine').isSunk()).toBe(true);
+
+    expect(board.getShipByName('Patrol Boat').hits).toBe(2);
+    expect(board.getShipByName('Patrol Boat').isSunk()).toBe(true);
+
+    expect(board.isAllSunk()).toBe(true);
+  })
+});

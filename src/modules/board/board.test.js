@@ -34,7 +34,7 @@ describe('hit behavior', () => {
 
   test('can place a hit at random', () => {
     board.receiveRandomHit();
-    console.log(board.receivedHits);
+    //console.log(board.receivedHits);
     expect(board.receivedHits.length).toBe(1);
   });
 
@@ -42,7 +42,50 @@ describe('hit behavior', () => {
     for (let i = 0; i < 10; i++) {
       board.receiveRandomHit();
     }
-    console.log(board.receivedHits);
+    //console.log(board.receivedHits);
     expect(board.receivedHits.length).toBe(10);
   });
 });
+
+describe('ship placement', () => {
+  beforeEach(() => board.clearShips());
+
+  test('initializes with all unplaced ships', () => {
+    expect(board.ships.length).toBe(5);
+    expect(Object.keys(board.shipCoordinates).length).toBe(5);
+  });
+
+  test('can place a Destroyer vertically', () => {
+    board.placeShipByName('Destroyer', 3, 3, 'vertical');
+    expect(board.shipCoordinates['Destroyer']).toEqual([[3, 3], [3, 4], [3, 5]]);
+  });
+
+  test('can place a Submarine horizontally', () => {
+    board.placeShipByName('Submarine', 3, 3, 'horizontal');
+    expect(board.shipCoordinates['Submarine']).toEqual([[3, 3], [4, 3], [5, 3]]);
+  });
+
+  test('cannot place a ship out of bounds', () => {
+    board.placeShipByName('Submarine', -1, -1, 'horizontal');
+    expect(board.shipCoordinates['Submarine']).toEqual([]);
+  })
+
+  test('cannot overlap ships', () => {
+    board.placeShipByName('Destroyer', 3, 3, 'vertical');
+    board.placeShipByName('Submarine', 3, 3, 'horizontal');
+    expect(board.shipCoordinates['Destroyer']).toEqual([[3, 3], [3, 4], [3, 5]]);
+  });
+
+  test('cannot place the same ship twice', () => {
+    board.placeShipByName('Destroyer', 3, 3, 'vertical');
+    board.placeShipByName('Destroyer', 4, 4, 'vertical');
+    expect(board.shipCoordinates['Destroyer']).toEqual([[3, 3], [3, 4], [3, 5]]);
+  })
+
+  test('can randomly place all ships', () => {
+    board.placeAllShipsRandomly();
+    console.log(board.shipCoordinates);
+    expect(Object.keys(board.shipCoordinates).length).toBe(5);
+    expect(board.getOccupied().length).toBe(17);
+  })
+})

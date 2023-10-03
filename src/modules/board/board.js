@@ -131,6 +131,12 @@ class Board {
     return occupied;
   }
 
+  isOccupied(x, y) {
+    return this.getOccupied().some(occupiedCell => {
+      return this.compareCoordinates(occupiedCell, [x, y]);
+    });
+  }
+
   compareCoordinates(coords1, coords2) {
     return (
       (coords1[0] === coords2[0]) &&
@@ -153,6 +159,31 @@ class Board {
 
   isValidToHit(x, y) {
     return !this.isHit(x, y) && this.isInBounds(x, y);
+  }
+
+  // print
+
+  print() {
+    let grid = ``;
+    for (let y = 0; y < 10; y++) { // columns
+      for (let x = 0; x < 10; x++) { // rows
+        if (this.isOccupied(x, y)) {
+          if (this.isHit(x, y)) {
+            grid += `◪ `;
+          } else {
+            grid += `■ `;
+          }
+        } else {
+          if (this.isHit(x, y)) {
+            grid += `x `;
+          } else {
+            grid += `□ `;
+          }
+        }
+      }; grid += `\n`;
+    }
+
+    console.log(grid);
   }
 }
 

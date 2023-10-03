@@ -34,7 +34,6 @@ describe('hit behavior', () => {
 
   test('can place a hit at random', () => {
     board.receiveRandomHit();
-    //console.log(board.receivedHits);
     expect(board.receivedHits.length).toBe(1);
   });
 
@@ -42,7 +41,6 @@ describe('hit behavior', () => {
     for (let i = 0; i < 10; i++) {
       board.receiveRandomHit();
     }
-    //console.log(board.receivedHits);
     expect(board.receivedHits.length).toBe(10);
   });
 });
@@ -84,8 +82,7 @@ describe('ship placement', () => {
 
   test('can randomly place all ships', () => {
     board.placeAllShipsRandomly();
-    console.log(board.shipCoordinates);
     expect(Object.keys(board.shipCoordinates).length).toBe(5);
     expect(board.getOccupied().length).toBe(17);
-  })
+  });
 })

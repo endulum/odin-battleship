@@ -192,15 +192,15 @@ class Board {
       for (let x = 0; x < 10; x++) { // rows
         if (this.isOccupied(x, y)) {
           if (this.isHit(x, y)) {
-            grid += `◪ `;
-          } else {
             grid += `■ `;
+          } else {
+            grid += `• `;
           }
         } else {
           if (this.isHit(x, y)) {
-            grid += `x `;
-          } else {
             grid += `□ `;
+          } else {
+            grid += `• `;
           }
         }
       }; grid += `\n`;

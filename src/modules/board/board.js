@@ -1,4 +1,5 @@
 import Ship from '../ship/ship';
+import random0to10 from '../helpers/random0to10';
 
 class Board {
 
@@ -78,7 +79,7 @@ class Board {
   placeAllShipsRandomly() {
     this.#ships.forEach(ship => {
       while (this.#shipCoordinates[ship.name].length === 0) {
-        this.placeShip(ship, this.random0to10(), this.random0to10(), this.randomOrientation());
+        this.placeShip(ship, random0to10(), random0to10(), this.randomOrientation());
       }
     });
   }
@@ -110,11 +111,11 @@ class Board {
   }
 
   receiveRandomHit() {
-    let x = this.random0to10();
-    let y = this.random0to10();
+    let x = random0to10();
+    let y = random0to10();
     while (this.isHit(x, y)) {
-      x = this.random0to10();
-      y = this.random0to10();
+      x = random0to10();
+      y = random0to10();
     }
     this.receiveHit(x, y);
   }
@@ -124,10 +125,6 @@ class Board {
   clear() {
     this.clearShips();
     this.clearHits();
-  }
-
-  random0to10() {
-    return Math.floor(Math.random() * 10);
   }
 
   randomOrientation() {

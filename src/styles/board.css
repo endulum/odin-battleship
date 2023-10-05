@@ -1,0 +1,104 @@
+:root {
+  --neutral: rgba(0,0,0,0.3);
+  --ship: rgba(169, 169, 169, 0.5);
+  --ship-border: rgb(169, 169, 169);
+  --hit: rgba(178, 34, 34, 0.5);
+  --hit-border: rgb(178, 34, 34);
+  --miss: rgba(112, 128, 144, 0.5);
+  --miss-border: rgb(112, 128, 144);
+}
+
+body {
+  font-family: monospace;
+}
+
+.board {
+  width: 30rem;
+  height: 30rem;
+  border: 4px double var(--neutral);
+  padding: 1.75rem;
+  padding-bottom: 1.125rem;
+  padding-right: 1.125rem;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.row {
+  width: 100%;
+  height: 10%;
+  display: flex;
+  flex-direction: row;
+
+  &:first-child {
+    border-top: 1px solid var(--neutral);
+  }
+}
+
+.cell {
+  width: 10%;
+  height: 100%;
+  padding: 1px;
+  border-bottom: 1px solid var(--neutral);
+  border-right: 1px solid var(--neutral);
+  position: relative;
+
+  &:first-child {
+    border-left: 1px solid var(--neutral);
+  }
+
+  & .x-indicator {
+    width: 100%;
+    min-height: 1rem;
+    text-align: center;
+    top: -1.25rem;
+  }
+
+  & .y-indicator {
+    position: absolute;
+    height: 100%;
+    min-width: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    left: -1.25rem;
+  }
+
+  & .x-indicator, .y-indicator {
+    position: absolute;
+    font-size: 0.875rem;
+    color: var(--neutral);
+  }
+
+  .fill-in {
+    width: 100%;
+    height: 100%;
+    padding: 0.25rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &.ship {
+      border: 1px solid var(--ship-border);
+      background-color: var(--ship);
+      color: var(--ship-border);
+    }
+
+    &.hit {
+      border: 1px solid var(--hit-border);
+      background-color: var(--hit);
+      color: var(--hit-border);
+    }
+
+    &.miss {
+      border: 1px solid var(--miss-border);
+      background-color: var(--miss);
+      color: var(--miss-border);
+    }
+
+    & svg {
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+}

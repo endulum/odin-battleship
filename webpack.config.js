@@ -2,6 +2,14 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.css$/i,
+        use: ["style-loader", "css-loader", "postcss-loader"],
+      }
+    ]
+  },
   mode: 'development',
   entry: './src/index.js',
   output: {
@@ -12,7 +20,7 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       title: 'Hello, World',
-      favicon: './src/favicon.ico'
+      favicon: './src/favicon.ico',
     })
   ],
   devtool: 'inline-source-map',

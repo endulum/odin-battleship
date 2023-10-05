@@ -12,8 +12,11 @@ body {
   font-family: monospace;
 }
 
+#your-board, #opponent-board {
+  transition: opacity 0.5s ease;
+}
+
 .inactive {
-  opacity: 0.5;
   pointer-events: none;
 }
 
@@ -26,7 +29,6 @@ body {
   padding-right: 1.125rem;
   display: flex;
   flex-wrap: wrap;
-  transition: opacity 0.5s ease;
 }
 
 .row {

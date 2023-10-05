@@ -2,43 +2,78 @@ import './styles/base.css';
 import './styles/board.css';
 import '@fortawesome/fontawesome-free/js/all.js';
 
-import Board from './modules/board/board'
-import Player from './modules/player/player'
-
-let whoseTurn = 'OPPONENT';
+import Player from './modules/player/player';
 
 const yourBoardDiv = document.getElementById('your-board');
 const opponentBoardDiv = document.getElementById('opponent-board');
 
-const gameplay = new Player();
-gameplay.placeAllShipsRandomly();
+class Controller {
+  #whoseTurn = undefined;
+  get whoseTurn() { return this.#whoseTurn }
 
-function playRound(x, y) {
-  gameplay.yourMove(x, y);
-  renderBoard(opponentBoardDiv, gameplay.opponentBoard);
+  #gameplay;
+  get gameplay() { return this.#gameplay }
 
-  if (gameplay.isGameRunning) {
-    opponentBoardDiv.classList.add('inactive');
-    yourBoardDiv.classList.remove('inactive');
-    whoseTurn = 'OPPONENT';
+  constructor() {
+    this.#gameplay = new Player();
+    this.#gameplay.placeAllShipsRandomly();
+    this.switchTurn();
+    renderBoard(this.#gameplay.yourBoard, 'PLAYER', this.#whoseTurn);
+    renderBoard(this.#gameplay.opponentBoard, 'OPPONENT', this.#whoseTurn);
+  }
 
-    setTimeout(() => {
-      renderBoard(yourBoardDiv, gameplay.yourBoard);
-      opponentBoardDiv.classList.remove('inactive');
-      yourBoardDiv.classList.add('inactive');
-      whoseTurn = 'PLAYER';
-    }, 500);
+  playRound(x, y) {
+    this.#gameplay.yourMove(x, y);
+    this.refreshBoards();
+  }
+
+  refreshBoards() {
+    renderBoard(this.#gameplay.opponentBoard, 'OPPONENT', this.#whoseTurn);
+    if (!this.#gameplay.winner) {
+      this.switchTurn();
+      renderBoard(this.#gameplay.opponentBoard, 'OPPONENT', this.#whoseTurn);
+      setTimeout(() => {
+        renderBoard(this.#gameplay.yourBoard, 'PLAYER', this.#whoseTurn);
+        if (!this.#gameplay.winner) {
+          this.switchTurn();
+          renderBoard(this.#gameplay.opponentBoard, 'OPPONENT', this.#whoseTurn);
+        }
+      }, 500);
+    }
+  }
+
+  switchTurn() {
+    if (this.#whoseTurn === undefined) {
+      this.#whoseTurn = 'PLAYER';
+      yourBoardDiv.style.opacity = 0.5;
+      opponentBoardDiv.style.opacity = 1;
+      return;
+    }
+    if (this.#whoseTurn === 'PLAYER') {
+      this.#whoseTurn = 'OPPONENT';
+      yourBoardDiv.style.opacity = 1;
+      opponentBoardDiv.style.opacity = 0.5;
+      return;
+    }
+    if (this.#whoseTurn === 'OPPONENT') {
+      this.#whoseTurn = 'PLAYER';
+      yourBoardDiv.style.opacity = 0.5;
+      opponentBoardDiv.style.opacity = 1;
+      return;
+    }
   }
 }
 
-renderBoard(yourBoardDiv, gameplay.yourBoard);
-yourBoardDiv.classList.add('inactive');
-whoseTurn = 'PLAYER';
-renderBoard(opponentBoardDiv, gameplay.opponentBoard);
-
-function renderBoard(parentDiv, boardData) {
+function renderBoard(boardData, whoseBoard, whoseTurn) {
   const board = document.createElement('div');
   board.classList.add('board');
+
+  let parentDiv;
+  if (whoseBoard === 'OPPONENT') {
+    parentDiv = opponentBoardDiv;
+  } else if (whoseBoard === 'PLAYER') {
+    parentDiv = yourBoardDiv;
+  }
 
   for (let y = 0; y < 10; y++) {
     const row = document.createElement('div');
@@ -52,25 +87,17 @@ function renderBoard(parentDiv, boardData) {
       cell.dataset.y = y;
 
       let cellHTML = ``;
-  
-      if (y === 0) {
-        cellHTML += `<div class="x-indicator">${x}</div>`
-      }
-  
-      if (x === 0) {
-        cellHTML += `<div class="y-indicator">${y}</div>`
-      }
 
       if (
-        whoseTurn === 'OPPONENT' &&
+        whoseBoard === 'PLAYER' &&
         boardData.isOccupied(x, y) &&
         !boardData.isHit(x, y)
       ) {
         cellHTML += `<div class="fill-in ship">
           <i class="fa-solid fa-ship"></i>
         </div>`
-      } 
-      
+      }
+
       if (
         !boardData.isOccupied(x, y) &&
         boardData.isHit(x, y)
@@ -88,22 +115,26 @@ function renderBoard(parentDiv, boardData) {
       }
 
       if (
-        gameplay.isGameRunning &&
+        whoseBoard === 'OPPONENT' &&
         whoseTurn === 'PLAYER' && 
-        boardData.isValidToHit(x, y)) {
+        !boardData.isAllSunk() &&
+        boardData.isValidToHit(x, y)
+      ) {
         cell.classList.add('can-hit');
         cell.addEventListener('click', () => {
-          playRound(x, y);
+          controller.playRound(x, y);
         })
       }
 
       cell.innerHTML = cellHTML;
       row.appendChild(cell);
     }
-  
+
     board.appendChild(row);
   }
 
   parentDiv.innerHTML = ``;
   parentDiv.appendChild(board);
 }
+
+const controller = new Controller();

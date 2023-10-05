@@ -3,24 +3,40 @@ import './styles/board.css';
 import '@fortawesome/fontawesome-free/js/all.js';
 
 import Board from './modules/board/board'
+import Player from './modules/player/player'
 
-// const player = new Player();
-// player.yourBoard.placeAllShipsRandomly();
+let whoseTurn = 'OPPONENT';
 
+const yourBoardDiv = document.getElementById('your-board');
+const opponentBoardDiv = document.getElementById('opponent-board');
 
-const myBoard = new Board();
-myBoard.placeAllShipsRandomly();
-// for (let i = 0; i < 15; i++) myBoard.receiveRandomHit();
+const gameplay = new Player();
+gameplay.placeAllShipsRandomly();
 
-// document.body.appendChild(renderBoard(myBoard));
+function playRound(x, y) {
+  gameplay.yourMove(x, y);
+  renderBoard(opponentBoardDiv, gameplay.opponentBoard);
 
-const myBoardDiv = document.createElement('div');
-myBoardDiv.setAttribute('id', 'my-board');
-document.body.appendChild(myBoardDiv);
+  if (gameplay.isGameRunning) {
+    opponentBoardDiv.classList.add('inactive');
+    yourBoardDiv.classList.remove('inactive');
+    whoseTurn = 'OPPONENT';
 
-renderBoard(myBoard);
+    setTimeout(() => {
+      renderBoard(yourBoardDiv, gameplay.yourBoard);
+      opponentBoardDiv.classList.remove('inactive');
+      yourBoardDiv.classList.add('inactive');
+      whoseTurn = 'PLAYER';
+    }, 500);
+  }
+}
 
-function renderBoard(boardData) {
+renderBoard(yourBoardDiv, gameplay.yourBoard);
+yourBoardDiv.classList.add('inactive');
+whoseTurn = 'PLAYER';
+renderBoard(opponentBoardDiv, gameplay.opponentBoard);
+
+function renderBoard(parentDiv, boardData) {
   const board = document.createElement('div');
   board.classList.add('board');
 
@@ -45,14 +61,15 @@ function renderBoard(boardData) {
         cellHTML += `<div class="y-indicator">${y}</div>`
       }
 
-      // if (
-      //   boardData.isOccupied(x, y) &&
-      //   !boardData.isHit(x, y)
-      // ) {
-      //   cellHTML += `<div class="fill-in ship">
-      //     <i class="fa-solid fa-ship"></i>
-      //   </div>`
-      // } 
+      if (
+        whoseTurn === 'OPPONENT' &&
+        boardData.isOccupied(x, y) &&
+        !boardData.isHit(x, y)
+      ) {
+        cellHTML += `<div class="fill-in ship">
+          <i class="fa-solid fa-ship"></i>
+        </div>`
+      } 
       
       if (
         !boardData.isOccupied(x, y) &&
@@ -70,11 +87,13 @@ function renderBoard(boardData) {
         </div>`
       }
 
-      if (boardData.isValidToHit(x, y)) {
+      if (
+        gameplay.isGameRunning &&
+        whoseTurn === 'PLAYER' && 
+        boardData.isValidToHit(x, y)) {
         cell.classList.add('can-hit');
         cell.addEventListener('click', () => {
-          boardData.receiveHit(x, y);
-          renderBoard(boardData);
+          playRound(x, y);
         })
       }
 
@@ -85,10 +104,6 @@ function renderBoard(boardData) {
     board.appendChild(row);
   }
 
-  //return board;
-  myBoardDiv.innerHTML = ``;
-  myBoardDiv.appendChild(board);
+  parentDiv.innerHTML = ``;
+  parentDiv.appendChild(board);
 }
-
-const board = document.createElement('div');
-board.classList.add('board');

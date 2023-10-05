@@ -19,8 +19,9 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      title: 'Hello, World',
-      favicon: './src/favicon.ico',
+      template: 'src/index.html',
+      // title: 'Hello, World',
+      // favicon: './src/favicon.ico',
     })
   ],
   devtool: 'inline-source-map',

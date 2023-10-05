@@ -100,13 +100,9 @@ class Board {
       this.#receivedHits.push([x, y]);
       this.#receivedHits.sort();
 
-      Object.keys(this.#shipCoordinates).forEach(ship => {
-        this.#shipCoordinates[ship].forEach(coord => {
-          if (this.compareCoordinates(coord, [x, y])) {
-            this.damageShipByName(ship);
-          }
-        })
-      })
+      if (this.whichShipHit(x, y)) {
+        this.damageShipByName(this.whichShipHit(x, y));
+      }
     }
   }
 
@@ -176,6 +172,22 @@ class Board {
   isValidToHit(x, y) {
     return !this.isHit(x, y) && this.isInBounds(x, y);
   }
+
+  whichShipHit(x, y) {
+    let shipName;
+
+    Object.keys(this.#shipCoordinates).forEach(ship => {
+      this.#shipCoordinates[ship].forEach(coord => {
+        if (this.compareCoordinates(coord, [x, y])) {
+          // this.damageShipByName(ship);
+          shipName = ship;
+        }
+      })
+    });
+
+    return shipName;
+  }
+  
 
   isAllSunk() {
     return this.#ships.every(ship => ship.isSunk());

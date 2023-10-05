@@ -1,9 +1,9 @@
 :root {
-  --neutral: rgba(0,0,0,0.3);
+  --neutral: rgb(169, 169, 169);
   --ship: rgba(169, 169, 169, 0.5);
   --ship-border: rgb(169, 169, 169);
-  --hit: rgba(178, 34, 34, 0.5);
-  --hit-border: rgb(178, 34, 34);
+  --hit: rgba(205, 92, 92, 0.5);
+  --hit-border: rgb(205, 92, 92);
   --miss: rgba(112, 128, 144, 0.5);
   --miss-border: rgb(112, 128, 144);
 }
@@ -15,7 +15,7 @@ body {
 .board {
   width: 30rem;
   height: 30rem;
-  border: 4px double var(--neutral);
+  border: 3px double var(--neutral);
   padding: 1.75rem;
   padding-bottom: 1.125rem;
   padding-right: 1.125rem;

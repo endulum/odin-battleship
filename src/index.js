@@ -2,57 +2,71 @@ import './styles/base.css';
 import './styles/board.css';
 import '@fortawesome/fontawesome-free/js/all.js';
 
-const board = document.createElement('div');
-board.classList.add('board');
-document.body.appendChild(board);
+import Player from './modules/player/player';
 
-for (let y = 0; y < 10; y++) {
-  const row = document.createElement('div');
-  row.classList.add('row');
+const player = new Player();
+player.yourBoard.placeAllShipsRandomly();
+for (let i = 0; i < 15; i++) player.yourBoard.receiveRandomHit();
 
-  for (let x = 0; x < 10; x++) {
-    const cell = document.createElement('div');
-    cell.classList.add('cell');
+document.body.appendChild(renderBoard(player.yourBoard));
 
-    cell.dataset.x = x;
-    cell.dataset.y = y;
+function renderBoard(boardData) {
+  const board = document.createElement('div');
+  board.classList.add('board');
 
-    if (y === 0) {
-      const indicator = document.createElement('div');
-      indicator.classList.add('x-indicator');
-      indicator.textContent = x;
-      cell.appendChild(indicator);
+  for (let y = 0; y < 10; y++) {
+    const row = document.createElement('div');
+    row.classList.add('row');
+  
+    for (let x = 0; x < 10; x++) {
+      const cell = document.createElement('div');
+      cell.classList.add('cell');
+  
+      cell.dataset.x = x;
+      cell.dataset.y = y;
+
+      let cellHTML = ``;
+  
+      if (y === 0) {
+        cellHTML += `<div class="x-indicator">${x}</div>`
+      }
+  
+      if (x === 0) {
+        cellHTML += `<div class="y-indicator">${y}</div>`
+      }
+
+      if (
+        boardData.isOccupied(x, y) &&
+        !boardData.isHit(x, y)
+      ) {
+        cellHTML += `<div class="fill-in ship">
+          <i class="fa-solid fa-ship"></i>
+        </div>`
+      } else if (
+        !boardData.isOccupied(x, y) &&
+        boardData.isHit(x, y)
+      ) {
+        cellHTML += `<div class="fill-in miss">
+          <i class="fa-solid fa-water"></i>
+        </div>`
+      } else if (
+        boardData.isOccupied(x, y) &&
+        boardData.isHit(x, y)
+      ) {
+        cellHTML += `<div class="fill-in hit">
+          <i class="fa-solid fa-burst"></i>
+        </div>`
+      }
+
+      cell.innerHTML = cellHTML;
+      row.appendChild(cell);
     }
-
-    if (x === 0) {
-      const indicator = document.createElement('div');
-      indicator.classList.add('y-indicator');
-      indicator.textContent = y;
-      cell.appendChild(indicator);
-    }
-
-    row.appendChild(cell);
+  
+    board.appendChild(row);
   }
 
-  board.appendChild(row);
+  return board;
 }
 
-const cells = document.querySelectorAll('.cell');
-
-const ship = document.createElement('div');
-ship.classList.add('fill-in');
-ship.classList.add('ship');
-ship.innerHTML = `<i class="fa-solid fa-ship"></i>`;
-cells[0].appendChild(ship);
-
-const hit = document.createElement('div');
-hit.classList.add('fill-in');
-hit.classList.add('hit');
-hit.innerHTML = `<i class="fa-solid fa-burst"></i>`;
-cells[1].appendChild(hit);
-
-const miss = document.createElement('div');
-miss.classList.add('fill-in');
-miss.classList.add('miss');
-miss.innerHTML = `<i class="fa-solid fa-water"></i>`;
-cells[2].appendChild(miss);
+const board = document.createElement('div');
+board.classList.add('board');

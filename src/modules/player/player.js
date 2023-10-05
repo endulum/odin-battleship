@@ -1,76 +1,79 @@
 import Board from "../board/board";
+import random0to10 from "../helpers/random0to10";
 
 class Player {
   #yourBoard;
   get yourBoard() { return this.#yourBoard };
 
-  #computerBoard;
-  get computerBoard() { return this.#computerBoard };
+  #opponentBoard;
+  get opponentBoard() { return this.#opponentBoard };
 
-  #winner;
-  get winner() { return this.#winner };
+  #winner = undefined;
+  get winner() { return this.#winner }; 
 
-  constructor(computerVersusComputer) {
+  #isGameRunning = false;
+  get isGameRunning() { return this.#isGameRunning };
+
+  constructor() {
     this.#yourBoard = new Board();
-    this.#computerBoard = new Board();
-    this.#computerBoard.placeAllShipsRandomly();
+    this.#opponentBoard = new Board();
+    this.#opponentBoard.placeAllShipsRandomly();
+  }
 
-    // make cpus fight each other...
-
-    if (computerVersusComputer) {
-      this.#yourBoard.placeAllShipsRandomly();
-      const [x, y] = this.findValidRandomMove();
-      this.yourTurn(x, y, true);
+  placeShipByName(shipName, x, y, orientation) {
+    this.#yourBoard.placeShipByName(shipName, x, y, orientation);
+    if (Object.keys(this.#yourBoard.shipCoordinates).every(ship => {
+      return this.#yourBoard.shipCoordinates[ship].length > 0
+    })) {
+      this.#isGameRunning = true;
     }
   }
 
-  yourTurn(x, y, computerVersusComputer) {
-    this.computerBoard.receiveHit(x, y);
-    if (this.checkWinner()) return;
-    this.#yourBoard.receiveRandomHit();
-    if (this.checkWinner()) return;
+  placeAllShipsRandomly() {
+    this.#yourBoard.placeAllShipsRandomly();
+    this.#isGameRunning = true;
+  }
 
-    if (computerVersusComputer) {
-      const [x, y] = this.findValidRandomMove();
-      this.yourTurn(x, y, true);
+  yourMove(x, y) {
+    if (this.#isGameRunning) {
+      if (this.opponentBoard.isValidToHit(x, y)) {
+        this.#opponentBoard.receiveHit(x, y);
+        this.checkWinner();
+        if (this.#isGameRunning) this.yourBoard.receiveRandomHit();
+        this.checkWinner();
+      }
+    }
+  }
+
+  makeRandomMove() {
+    if (this.#isGameRunning) {
+      let x = random0to10();
+      let y = random0to10();
+      while (!this.#opponentBoard.isValidToHit(x, y)) {
+        x = random0to10();
+        y = random0to10();
+      }
+
+      this.yourMove(x, y);
     }
   }
 
   checkWinner() {
-    if (this.#computerBoard.isAllSunk()) {
+    if (this.#opponentBoard.isAllSunk()) {
       this.#winner = 'PLAYER';
+      this.#isGameRunning = false;
       this.announceWinner();
-      return true;
-    }
+    } 
     
     if (this.#yourBoard.isAllSunk()) {
       this.#winner = 'COMPUTER';
+      this.#isGameRunning = false;
       this.announceWinner();
-      return true;
     }
-
-    return false;
   }
 
   announceWinner() {
     console.log(`The winner is ${this.#winner}`);
-  }
-
-  // helper
-
-  findValidRandomMove() {
-    let x = this.random0to10();
-    let y = this.random0to10();
-    while (!this.#computerBoard.isValidToHit(x, y)) {
-      x = this.random0to10();
-      y = this.random0to10();
-    }
-
-    return [x, y];
-  }
-
-  random0to10() {
-    return Math.floor(Math.random() * 10);
   }
 }
 

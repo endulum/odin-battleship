@@ -48,15 +48,16 @@ class Controller {
 }
 
 function renderBoard(boardData, whoseBoard, whoseTurn) {
-  const board = document.createElement('div');
-  board.classList.add('board');
-
+  
   let parentDiv;
   if (whoseBoard === 'OPPONENT') {
     parentDiv = opponentBoardDiv;
   } else if (whoseBoard === 'PLAYER') {
     parentDiv = yourBoardDiv;
   }
+
+  const board = document.createElement('div');
+  board.classList.add('board');
 
   for (let y = 0; y < 10; y++) {
     const row = document.createElement('div');
@@ -124,8 +125,27 @@ function renderBoard(boardData, whoseBoard, whoseTurn) {
     board.appendChild(row);
   }
 
+  const status = document.createElement('div');
+  status.classList.add('status');
+  let statusHTML = `<h3>${whoseBoard === 'PLAYER' ? 
+    "Your Board" : 
+    "Computer's Board"}
+  </h3>`;
+
+  boardData.ships.forEach(ship => {
+    statusHTML += `<p>
+      ${ship.name}: 
+      ${ship.isSunk() ? 
+        "<span class='text-sunk'>Sunk</span>" : 
+        "<span class='text-afloat'>Afloat</span>"}
+    </p>`;
+  });
+
+  status.innerHTML = statusHTML;
+
   parentDiv.innerHTML = ``;
   parentDiv.appendChild(board);
+  parentDiv.appendChild(status);
 }
 
 const controller = new Controller();

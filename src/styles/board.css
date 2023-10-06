@@ -14,6 +14,9 @@ body {
 
 #your-board, #opponent-board {
   transition: opacity 0.5s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 /* .inactive {
@@ -115,7 +118,23 @@ body {
       height: 100%;
     }
   }
+}
 
-  
+.status {
+  text-align: center;
+  line-height: 1.25rem;
+}
 
+h3 {
+  margin-bottom: 0.5rem;
+}
+
+.text-sunk {
+  font-weight: bold;
+  color: var(--hit-border);
+}
+
+.text-afloat {
+  font-weight: bold;
+  color: var(--miss-border);
 }

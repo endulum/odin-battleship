@@ -12,7 +12,27 @@ body {
   font-family: monospace;
 }
 
+.wrapper {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+}
+
+header {
+  width: 100%;
+  text-align: center;
+
+  & h2 {
+    font-weight: normal;
+  }
+}
+
 #your-board, #opponent-board {
+  /* width: calc(50% - 15px); */
+  width: min-content;
   transition: opacity 0.5s ease;
   display: flex;
   flex-direction: column;

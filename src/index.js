@@ -16,6 +16,7 @@ class Controller {
     this.#gameplay.placeAllShipsRandomly();
     renderBoard(this.#gameplay.yourBoard, 'PLAYER', 'PLAYER');
     renderBoard(this.#gameplay.opponentBoard, 'OPPONENT', 'PLAYER');
+    updateHeader('player turn');
     this.dimYourBoard();
   }
 
@@ -36,11 +37,23 @@ class Controller {
 
   refreshBoards() {
     renderBoard(this.#gameplay.opponentBoard, 'OPPONENT', 'OPPONENT');
-    if (this.#gameplay.winner) return;
+
+    if (this.#gameplay.winner === 'PLAYER') {
+      updateHeader('player win');
+      return;
+    }
+
+    updateHeader('opponent turn');
     this.dimOpponentBoard();
     setTimeout(() => {
       renderBoard(this.#gameplay.yourBoard, 'PLAYER', 'OPPONENT');
-      if (this.#gameplay.winner) return;
+
+      if (this.#gameplay.winner === 'COMPUTER') {
+        updateHeader('opponent win');
+        return;
+      }
+
+      updateHeader('player turn');
       renderBoard(this.#gameplay.opponentBoard, 'OPPONENT', 'PLAYER');
       this.dimYourBoard();
     }, 750);
@@ -146,6 +159,45 @@ function renderBoard(boardData, whoseBoard, whoseTurn) {
   parentDiv.innerHTML = ``;
   parentDiv.appendChild(board);
   parentDiv.appendChild(status);
+}
+
+function updateHeader(statusText) {
+  const headerDiv = document.querySelector('header');
+
+  switch(statusText) {
+    case 'player turn':
+      headerDiv.innerHTML = `<h1>It's your turn.</h1>
+        <h2>Click on a cell to launch an attack.</h2>`;
+      break;
+    case 'opponent turn':
+      headerDiv.innerHTML = `<h1>It's your opponent's turn.</h1>
+        <h2>The computer is thinking...</h2>`;
+      break;
+    case 'player win':
+      headerDiv.innerHTML = `<h1>You won!</h1>
+        <h2>You sunk all your opponent's ships!</h2>`;
+      break;
+    case 'opponent win':
+      headerDiv.innerHTML = `<h1>You lost!</h1>
+        <h2>Your opponent sunk all your ships!</h2>`;
+      break;
+  }
+
+  // if (
+  //   whoseBoard === 'OPPONENT' &&
+  //   whoseTurn === 'PLAYER'
+  // ) {
+    // headerDiv.innerHTML = `<h1>It's your turn.</h1>
+    //   <h2>Click on a cell to launch an attack.</h2>`;
+  // }
+
+  // if (
+  //   whoseBoard === 'PLAYER' &&
+  //   whoseTurn === 'OPPONENT'
+  // ) {
+    // headerDiv.innerHTML = `<h1>It's your opponent's turn.</h1>
+    //   <h2>The computer is thinking...</h2>`;
+  // }
 }
 
 const controller = new Controller();

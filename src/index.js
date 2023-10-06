@@ -8,18 +8,15 @@ const yourBoardDiv = document.getElementById('your-board');
 const opponentBoardDiv = document.getElementById('opponent-board');
 
 class Controller {
-  #whoseTurn = undefined;
-  get whoseTurn() { return this.#whoseTurn }
-
   #gameplay;
   get gameplay() { return this.#gameplay }
 
   constructor() {
     this.#gameplay = new Player();
     this.#gameplay.placeAllShipsRandomly();
-    this.switchTurn();
-    renderBoard(this.#gameplay.yourBoard, 'PLAYER', this.#whoseTurn);
-    renderBoard(this.#gameplay.opponentBoard, 'OPPONENT', this.#whoseTurn);
+    renderBoard(this.#gameplay.yourBoard, 'PLAYER', 'PLAYER');
+    renderBoard(this.#gameplay.opponentBoard, 'OPPONENT', 'PLAYER');
+    this.dimYourBoard();
   }
 
   playRound(x, y) {
@@ -27,40 +24,26 @@ class Controller {
     this.refreshBoards();
   }
 
-  refreshBoards() {
-    renderBoard(this.#gameplay.opponentBoard, 'OPPONENT', this.#whoseTurn);
-    if (!this.#gameplay.winner) {
-      this.switchTurn();
-      renderBoard(this.#gameplay.opponentBoard, 'OPPONENT', this.#whoseTurn);
-      setTimeout(() => {
-        renderBoard(this.#gameplay.yourBoard, 'PLAYER', this.#whoseTurn);
-        if (!this.#gameplay.winner) {
-          this.switchTurn();
-          renderBoard(this.#gameplay.opponentBoard, 'OPPONENT', this.#whoseTurn);
-        }
-      }, 500);
-    }
+  dimYourBoard() {
+    yourBoardDiv.style.opacity = 0.5;
+    opponentBoardDiv.style.opacity = 1;
   }
 
-  switchTurn() {
-    if (this.#whoseTurn === undefined) {
-      this.#whoseTurn = 'PLAYER';
-      yourBoardDiv.style.opacity = 0.5;
-      opponentBoardDiv.style.opacity = 1;
-      return;
-    }
-    if (this.#whoseTurn === 'PLAYER') {
-      this.#whoseTurn = 'OPPONENT';
-      yourBoardDiv.style.opacity = 1;
-      opponentBoardDiv.style.opacity = 0.5;
-      return;
-    }
-    if (this.#whoseTurn === 'OPPONENT') {
-      this.#whoseTurn = 'PLAYER';
-      yourBoardDiv.style.opacity = 0.5;
-      opponentBoardDiv.style.opacity = 1;
-      return;
-    }
+  dimOpponentBoard() {
+    yourBoardDiv.style.opacity = 1;
+    opponentBoardDiv.style.opacity = 0.5;
+  }
+
+  refreshBoards() {
+    renderBoard(this.#gameplay.opponentBoard, 'OPPONENT', 'OPPONENT');
+    if (this.#gameplay.winner) return;
+    this.dimOpponentBoard();
+    setTimeout(() => {
+      renderBoard(this.#gameplay.yourBoard, 'PLAYER', 'OPPONENT');
+      if (this.#gameplay.winner) return;
+      renderBoard(this.#gameplay.opponentBoard, 'OPPONENT', 'PLAYER');
+      this.dimYourBoard();
+    }, 750);
   }
 }
 
@@ -87,6 +70,14 @@ function renderBoard(boardData, whoseBoard, whoseTurn) {
       cell.dataset.y = y;
 
       let cellHTML = ``;
+
+      if (y === 0) {
+        cellHTML += `<div class="x-indicator">${x}</div>`
+      }
+  
+      if (x === 0) {
+        cellHTML += `<div class="y-indicator">${y}</div>`
+      }
 
       if (
         whoseBoard === 'PLAYER' &&

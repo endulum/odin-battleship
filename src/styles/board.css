@@ -16,9 +16,9 @@ body {
   transition: opacity 0.5s ease;
 }
 
-.inactive {
+/* .inactive {
   pointer-events: none;
-}
+} */
 
 .board {
   width: 30rem;

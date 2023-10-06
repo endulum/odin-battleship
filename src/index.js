@@ -13,7 +13,22 @@ class Controller {
 
   constructor() {
     this.#gameplay = new Player();
-    this.#gameplay.placeAllShipsRandomly();
+    renderBoard(this.#gameplay.yourBoard, 'PLAYER', undefined);
+    renderBoard(this.#gameplay.opponentBoard, 'OPPONENT', undefined);
+    updateHeader('placing ships');
+  }
+
+  makeShipPlacement(shipName, x, y, orientation) {
+    this.#gameplay.placeShipByName(shipName, x, y, orientation);
+    console.log(`placed ${shipName} at ${x}, ${y}`);
+    if (this.#gameplay.isGameRunning) {
+      this.startGame();
+    } else {
+      renderBoard(this.#gameplay.yourBoard, 'PLAYER', undefined);
+    }
+  }
+
+  startGame() {
     renderBoard(this.#gameplay.yourBoard, 'PLAYER', 'PLAYER');
     renderBoard(this.#gameplay.opponentBoard, 'OPPONENT', 'PLAYER');
     updateHeader('player turn');
@@ -61,6 +76,7 @@ class Controller {
 }
 
 function renderBoard(boardData, whoseBoard, whoseTurn) {
+  //console.table(whoseBoard, whoseTurn);
   
   let parentDiv;
   if (whoseBoard === 'OPPONENT') {
@@ -131,6 +147,28 @@ function renderBoard(boardData, whoseBoard, whoseTurn) {
         })
       }
 
+      if (
+        whoseBoard === 'PLAYER' &&
+        whoseTurn === undefined
+      ) {
+        // find the first ship that is not placed
+        const unplacedShip = boardData.getShipByName(
+          Object.keys(boardData.shipCoordinates).find(ship => {
+            return boardData.shipCoordinates[ship].length === 0;
+          })
+        );
+
+        if (
+          boardData.isInBounds(x, y) &&
+          boardData.isInBounds(x + unplacedShip.length - 1, y)
+        ) {
+          cell.classList.add('can-place');
+          cell.addEventListener('click' , () => {
+            controller.makeShipPlacement(unplacedShip.name, x, y, 'horizontal');
+          })
+        }
+      }
+
       cell.innerHTML = cellHTML;
       row.appendChild(cell);
     }
@@ -146,11 +184,12 @@ function renderBoard(boardData, whoseBoard, whoseTurn) {
   </h3>`;
 
   boardData.ships.forEach(ship => {
-    statusHTML += `<p>
-      ${ship.name}: 
-      ${ship.isSunk() ? 
-        "<span class='text-sunk'>Sunk</span>" : 
-        "<span class='text-afloat'>Afloat</span>"}
+    statusHTML += `<p>${ship.name}: 
+      ${boardData.shipCoordinates[ship.name].length === 0 ?
+        "<b>Unplaced</b>" :
+        ship.isSunk() ? 
+          "<span class='text-sunk'>Sunk</span>" : 
+          "<span class='text-afloat'>Afloat</span>"}
     </p>`;
   });
 
@@ -180,6 +219,10 @@ function updateHeader(statusText) {
     case 'opponent win':
       headerDiv.innerHTML = `<h1>You lost!</h1>
         <h2>Your opponent sunk all your ships!</h2>`;
+      break;
+    case 'placing ships':
+      headerDiv.innerHTML = `<h1>Welcome to Battleship</h1>
+        <h2>Place all your ships on your grid to start.</h2>`;
       break;
   }
 

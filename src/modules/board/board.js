@@ -43,9 +43,9 @@ class Board {
       // the starting coordinates are out of bounds
       !this.isInBounds(x, y) ||
       // in horizontal, the end coordinates are out of bounds
-      (orientation === 'horizontal' && !this.isInBounds(x + ship.length, y)) ||
+      (orientation === 'horizontal' && !this.isInBounds(x + ship.length - 1, y)) ||
       // in vertical, the end coordinates are out of bounds
-      (orientation === 'vertical' && !this.isInBounds(x, y + ship.length))
+      (orientation === 'vertical' && !this.isInBounds(x, y + ship.length - 1))
     ) return;
 
     const placementCoordinates = [];

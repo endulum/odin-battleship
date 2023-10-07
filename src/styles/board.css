@@ -107,6 +107,11 @@ header {
     }
   }
 
+  &.placement {
+    background-color: var(--ship);
+    cursor: pointer;
+  }
+
   .fill-in {
     width: 100%;
     height: 100%;

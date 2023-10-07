@@ -147,27 +147,27 @@ function renderBoard(boardData, whoseBoard, whoseTurn) {
         })
       }
 
-      if (
-        whoseBoard === 'PLAYER' &&
-        whoseTurn === undefined
-      ) {
-        // find the first ship that is not placed
-        const unplacedShip = boardData.getShipByName(
-          Object.keys(boardData.shipCoordinates).find(ship => {
-            return boardData.shipCoordinates[ship].length === 0;
-          })
-        );
+      // if (
+      //   whoseBoard === 'PLAYER' &&
+      //   whoseTurn === undefined
+      // ) {
+      //   // find the first ship that is not placed
+        // const unplacedShip = boardData.getShipByName(
+        //   Object.keys(boardData.shipCoordinates).find(ship => {
+        //     return boardData.shipCoordinates[ship].length === 0;
+        //   })
+        // );
 
-        if (
-          boardData.isInBounds(x, y) &&
-          boardData.isInBounds(x + unplacedShip.length - 1, y)
-        ) {
-          cell.classList.add('can-place');
-          cell.addEventListener('click' , () => {
-            controller.makeShipPlacement(unplacedShip.name, x, y, 'horizontal');
-          })
-        }
-      }
+        // if (
+        //   boardData.isInBounds(x, y) &&
+        //   boardData.isInBounds(x + unplacedShip.length - 1, y)
+        // ) {
+      //     cell.classList.add('can-place');
+          // cell.addEventListener('click' , () => {
+          //   controller.makeShipPlacement(unplacedShip.name, x, y, 'horizontal');
+          // })
+      //   }
+      // }
 
       cell.innerHTML = cellHTML;
       row.appendChild(cell);
@@ -198,6 +198,49 @@ function renderBoard(boardData, whoseBoard, whoseTurn) {
   parentDiv.innerHTML = ``;
   parentDiv.appendChild(board);
   parentDiv.appendChild(status);
+
+  // grabbing cells 
+
+  if (
+    whoseBoard === 'PLAYER' &&
+    whoseTurn === undefined
+  ) {
+    const unplacedShip = boardData.getShipByName(
+      Object.keys(boardData.shipCoordinates).find(ship => {
+        return boardData.shipCoordinates[ship].length === 0;
+      })
+    );
+
+    const cells = document.querySelectorAll('.cell');
+
+    function getCellByCoord(x, y) {
+      return Array.from(cells).find(cell => parseInt(cell.dataset.x) === x && parseInt(cell.dataset.y) === y);
+    }
+    
+    cells.forEach(cell => {
+      const x = parseInt(cell.dataset.x);
+      const y = parseInt(cell.dataset.y);
+
+      if (
+        boardData.isInBounds(x, y) &&
+        boardData.isInBounds(x + unplacedShip.length - 1, y)
+      ) {
+        cell.addEventListener('mouseover', () => {
+          for (let i = x; i < x + unplacedShip.length; i++) {
+            getCellByCoord(i, y).classList.add('placement');
+          }
+        });
+        cell.addEventListener('mouseleave', () => {
+          for (let i = x; i < x + unplacedShip.length; i++) {
+            getCellByCoord(i, y).classList.remove('placement');
+          }
+        });
+        cell.addEventListener('click' , () => {
+          controller.makeShipPlacement(unplacedShip.name, x, y, 'horizontal');
+        })
+      }
+    })
+  }
 }
 
 function updateHeader(statusText) {

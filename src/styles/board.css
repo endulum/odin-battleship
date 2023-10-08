@@ -13,35 +13,31 @@ body {
 }
 
 .wrapper {
+  width: 100%;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
-  align-items: center;
   gap: 30px;
-}
 
-header {
-  width: 100%;
-  text-align: center;
+  & header {
+    width: 100%;
+    text-align: center;
 
-  & h2 {
-    font-weight: normal;
+    & h2 {
+      margin-top: 0.5rem;
+      font-size: 1.125rem;
+      font-weight: normal;
+    }
+  }
+
+  & #your-board, #opponent-board {    
+    transition: opacity 0.5s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
   }
 }
-
-#your-board, #opponent-board {
-  /* width: calc(50% - 15px); */
-  width: min-content;
-  transition: opacity 0.5s ease;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-/* .inactive {
-  pointer-events: none;
-} */
 
 .board {
   width: 30rem;
@@ -104,72 +100,58 @@ header {
     background-color: var(--ship);
     cursor: pointer;
   }
+}
 
-  /* &.can-hit {
-    &:hover {
-      background-color: var(--ship);
-      cursor: pointer;
-    }
+.fill-in {
+  width: 100%;
+  height: 100%;
+  padding: 0.25rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &.ship {
+    border: 1px solid var(--ship-border);
+    background-color: var(--ship);
+    color: var(--ship-border);
   }
 
-  &.placement {
-    background-color: var(--ship);
-    cursor: pointer;
-  } */
+  &.hit {
+    border: 1px solid var(--hit-border);
+    background-color: var(--hit);
+    color: var(--hit-border);
+  }
 
-  .fill-in {
+  &.miss {
+    border: 1px solid var(--miss-border);
+    background-color: var(--miss);
+    color: var(--miss-border);
+  }
+
+  & svg {
     width: 100%;
     height: 100%;
-    padding: 0.25rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    &.ship {
-      border: 1px solid var(--ship-border);
-      background-color: var(--ship);
-      color: var(--ship-border);
-    }
-
-    &.hit {
-      border: 1px solid var(--hit-border);
-      background-color: var(--hit);
-      color: var(--hit-border);
-    }
-
-    &.miss {
-      border: 1px solid var(--miss-border);
-      background-color: var(--miss);
-      color: var(--miss-border);
-    }
-
-    & svg {
-      width: 100%;
-      height: 100%;
-    }
   }
 }
 
 .status {
   text-align: center;
   line-height: 1.25rem;
+
+  & .text-sunk {
+    font-weight: bold;
+    color: var(--hit-border);
+  }
+  
+  & .text-afloat {
+    font-weight: bold;
+    color: var(--miss-border);
+  }
+
+  & h3 {
+    margin-bottom: 0.5rem;
+  }
 }
 
-h2 {
-  font-size: 1.125rem;
-  margin-top: 0.5rem;
-}
 
-h3 {
-  margin-bottom: 0.5rem;
-}
 
-.text-sunk {
-  font-weight: bold;
-  color: var(--hit-border);
-}
-
-.text-afloat {
-  font-weight: bold;
-  color: var(--miss-border);
-}

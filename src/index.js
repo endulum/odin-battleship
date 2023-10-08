@@ -11,6 +11,7 @@ function Controller() {
 
   view.renderBoard(gameplay.yourBoard, 'PLAYER', undefined);
   view.renderBoard(gameplay.opponentBoard, 'OPPONENT', undefined);
+  view.dimOpponentBoard();
   view.updateHeader('placing ships');
 
   function placeShip(shipName, x, y, orientation) {
@@ -133,7 +134,20 @@ function View() {
     if (
       whoseBoard === 'PLAYER' &&
       whoseTurn === undefined
-    ) ableToPlaceShips(boardData, 'horizontal');
+    ) {
+      let orientation = 'horizontal'
+      ableToPlaceShips(boardData, orientation);
+      board.addEventListener('contextmenu', event => {
+        event.preventDefault();
+        if (orientation === 'horizontal') {
+          ableToPlaceShips(boardData, 'vertical');
+          orientation = 'vertical';
+        } else if (orientation === 'vertical') {
+          ableToPlaceShips(boardData, 'horizontal');
+          orientation = 'horizontal';
+        }
+      });
+    }
 
   }
 
@@ -163,26 +177,61 @@ function View() {
 
     if (orientation === 'horizontal') {
       cells.forEach(cell => {
+        const clone = cell.cloneNode(true);
+        clone.classList.remove('action');
+
         const x = parseInt(cell.dataset.x);
         const y = parseInt(cell.dataset.y);
 
         if (isCoordInBounds(x + unplacedShip.length - 1, y)) {
-          cell.addEventListener('mouseover', () => {
+          clone.addEventListener('mouseover', () => {
             for (let i = x; i < x + unplacedShip.length; i++) {
               getCellByCoord(i, y).classList.add('action');
             }
           });
 
-          cell.addEventListener('mouseleave', () => {
+          clone.addEventListener('mouseleave', () => {
             for (let i = x; i < x + unplacedShip.length; i++) {
               getCellByCoord(i, y).classList.remove('action');
             }
           });
 
-          cell.addEventListener('click' , () => {
+          clone.addEventListener('click' , () => {
             controller.placeShip(unplacedShip.name, x, y, 'horizontal');
           });
         }
+
+        cell.replaceWith(clone);
+      })
+    }
+
+    if (orientation === 'vertical') {
+      cells.forEach(cell => {
+        const clone = cell.cloneNode(true);
+        clone.classList.remove('action');
+
+        const x = parseInt(cell.dataset.x);
+        const y = parseInt(cell.dataset.y);
+
+        if (isCoordInBounds(x, y + unplacedShip.length - 1)) {
+          clone.addEventListener('mouseover', () => {
+            for (let i = y; i < y + unplacedShip.length; i++) {
+              getCellByCoord(x, i).classList.add('action');
+            }
+          });
+
+          clone.addEventListener('mouseleave', () => {
+            for (let i = y; i < y + unplacedShip.length; i++) {
+              getCellByCoord(x, i).classList.remove('action');
+            }
+          });
+
+          clone.addEventListener('click' , () => {
+            controller.placeShip(unplacedShip.name, x, y, 'vertical');
+          });
+        }
+
+        cell.replaceWith(clone);
       })
     }
   }

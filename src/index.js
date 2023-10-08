@@ -30,6 +30,15 @@ function Controller() {
     view.dimYourBoard();
   }
 
+  function resetGame() {
+    gameplay.clearAll();
+
+    view.renderBoard(gameplay.yourBoard, 'PLAYER', undefined);
+    view.renderBoard(gameplay.opponentBoard, 'OPPONENT', undefined);
+    view.dimOpponentBoard();
+    view.updateHeader('placing ships');
+  }
+
   function refreshBoards() {
     view.renderBoard(gameplay.opponentBoard, 'OPPONENT', 'OPPONENT');
     if (gameplay.winner === 'PLAYER') {
@@ -57,7 +66,7 @@ function Controller() {
     refreshBoards();
   }
 
-  return { playRound, placeShip, refreshBoards }
+  return { playRound, placeShip, refreshBoards, resetGame }
 }
 
 function View() {
@@ -271,16 +280,23 @@ function View() {
         break;
       case 'player win':
         headerDiv.innerHTML = `<h1>You won!</h1>
-          <h2>You sunk all your opponent's ships!</h2>`;
+          <h2>You sunk all your opponent's ships! <a id="play-again">Play again?</a></h2>`;
         break;
       case 'opponent win':
         headerDiv.innerHTML = `<h1>You lost!</h1>
-          <h2>Your opponent sunk all your ships!</h2>`;
+          <h2>Your opponent sunk all your ships! <a id="play-again">Play again?</a></h2></h2>`;
         break;
       case 'placing ships':
         headerDiv.innerHTML = `<h1>Welcome to Battleship</h1>
-          <h2>Place all your ships to start. Right-click to rotate the ship.</h2>`;
+          <h2>Place ships on your board to start. Right-click to rotate the ship.</h2>`;
         break;
+    }
+
+    const playAgain = document.getElementById('play-again');
+    if (playAgain) {
+      playAgain.addEventListener('click', () => {
+        controller.resetGame();
+      })
     }
   }
 

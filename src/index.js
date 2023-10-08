@@ -58,7 +58,7 @@ function Controller() {
       view.updateHeader('player turn');
       view.renderBoard(gameplay.opponentBoard, 'OPPONENT', 'PLAYER');
       view.dimYourBoard();
-    }, 500)
+    }, 500 + Math.ceil(Math.random() * 1000));
   }
 
   function playRound(x, y) {

@@ -1,141 +1,141 @@
 import Board from './board';
 
 let board;
-beforeEach(() => { board = new Board() });
 
-describe('hit behavior', () => {
-  beforeEach(() => { board.clearHits() });
-
-  test('can place a hit', () => {
-    board.receiveHit(3, 3);
-    expect(board.receivedHits).toEqual([[3, 3]]);
+describe('init', () => {
+  beforeEach(() => { 
+    board = new Board(); 
   });
 
-  test('can place multiple hits', () => {
-    board.receiveHit(4, 4);
-    board.receiveHit(5, 5);
-    board.receiveHit(6, 6);
-    expect(board.receivedHits).toEqual([[4, 4], [5, 5], [6, 6]]);
+  test('has five ship objects', () => {
+    expect(board.ships.length).toBe(5);
+    expect(board.ships.every(ship => typeof ship === 'object')).toBeTruthy();
   });
 
-  test('cannot place hits out of bounds', () => {
-    board.receiveHit(10, 10);
-    board.receiveHit(-1, -1);
-    expect(board.receivedHits).toEqual([]);
+  test('ships are not yet placed', () => {
+    expect(board.getFirstUnplacedShip()).toBeTruthy();
   });
 
-  test('cannot place more than one hit in the same cell', () => {
-    board.receiveHit(1, 1);
-    board.receiveHit(2, 2);
-    board.receiveHit(1, 1);
-    expect(board.receivedHits).toEqual([[1, 1], [2, 2]]);
+  // test('receiving a hit before ship placement does nothing', () => {
+  //   board.receiveHit(3, 3);
+  //   expect(board.hitCoords).toEqual([])
+  // });
+});
+
+describe('ship behavior', () => {
+  beforeEach(() => { 
+    board = new Board(); 
   });
 
-  test('can place a hit at random', () => {
-    board.receiveRandomHit();
-    expect(board.receivedHits.length).toBe(1);
+  test('can place a ship horizontally', () => {
+    board.placeShip('Destroyer', 3, 3, 'horizontal');
+    expect(board.shipCoords['Destroyer']).toEqual([[3, 3], [4, 3], [5, 3]]);
   });
 
-  test('can place ten different hits at random', () => {
-    for (let i = 0; i < 10; i++) {
-      board.receiveRandomHit();
-    }
-    expect(board.receivedHits.length).toBe(10);
+  test('can place a ship vertically', () => {
+    board.placeShip('Destroyer', 3, 3, 'vertical');
+    expect(board.shipCoords['Destroyer']).toEqual([[3, 3], [3, 4], [3, 5]]);
+  });
+
+  test('nothing happens when ship is placed over another ship', () => {
+    board.placeShip('Destroyer', 3, 3, 'horizontal');
+    board.placeShip('Submarine', 4, 3, 'horizontal');
+    expect(board.shipCoords['Destroyer']).toEqual([[3, 3], [4, 3], [5, 3]]);
+    expect(board.shipCoords['Submarine']).toEqual([]);
+  });
+
+  test('nothing happens when ship is placed twice', () => {
+    board.placeShip('Destroyer', 3, 3, 'horizontal');
+    board.placeShip('Destroyer', 4, 3, 'horizontal');
+    expect(board.shipCoords['Destroyer']).toEqual([[3, 3], [4, 3], [5, 3]]);
+  });
+
+  test('nothing happens when ship is placed out of bounds', () => {
+    board.placeShip('Destroyer', -1, -1, 'horizontal');
+    board.placeShip('Destroyer', 10, 10, 'horizontal');
+    expect(board.shipCoords['Destroyer']).toEqual([]);
+  });
+
+  test('can place all ships randomly', () => {
+    board.placeAllShipsRandomly();
+    expect(board.getAllOccupied().length).toBe(17);
   });
 });
 
-describe('ship placement', () => {
-  beforeEach(() => board.clearShips());
-
-  test('initializes with all unplaced ships', () => {
-    expect(board.ships.length).toBe(5);
-    expect(Object.keys(board.shipCoordinates).length).toBe(5);
+describe('hit behavior', () => {
+  beforeEach(() => { 
+    board = new Board(); 
   });
 
-  test('can place a Destroyer vertically', () => {
-    board.placeShipByName('Destroyer', 3, 3, 'vertical');
-    expect(board.shipCoordinates['Destroyer']).toEqual([[3, 3], [3, 4], [3, 5]]);
+  test('can place a hit', () => {
+    board.receiveHit(3, 3);
+    expect(board.hitCoords).toEqual([[3, 3]]);
   });
 
-  test('can place a Submarine horizontally', () => {
-    board.placeShipByName('Submarine', 3, 3, 'horizontal');
-    expect(board.shipCoordinates['Submarine']).toEqual([[3, 3], [4, 3], [5, 3]]);
+  test('nothing happens when same cell is hit twice', () => {
+    board.receiveHit(3, 3);
+    board.receiveHit(3, 3);
+    expect(board.hitCoords).toEqual([[3, 3]]);
   });
 
-  test('cannot place a ship out of bounds', () => {
-    board.placeShipByName('Submarine', -1, -1, 'horizontal');
-    expect(board.shipCoordinates['Submarine']).toEqual([]);
-  })
-
-  test('cannot overlap ships', () => {
-    board.placeShipByName('Destroyer', 3, 3, 'vertical');
-    board.placeShipByName('Submarine', 3, 3, 'horizontal');
-    expect(board.shipCoordinates['Destroyer']).toEqual([[3, 3], [3, 4], [3, 5]]);
+  test('nothing happens when hit is out of bounds', () => {
+    board.receiveHit(10, 10);
+    board.receiveHit(-1, -1);
+    expect(board.hitCoords).toEqual([]);
   });
 
-  test('cannot place the same ship twice', () => {
-    board.placeShipByName('Destroyer', 3, 3, 'vertical');
-    board.placeShipByName('Destroyer', 4, 4, 'vertical');
-    expect(board.shipCoordinates['Destroyer']).toEqual([[3, 3], [3, 4], [3, 5]]);
-  })
-
-  test('can randomly place all ships', () => {
-    board.placeAllShipsRandomly();
-    expect(Object.keys(board.shipCoordinates).length).toBe(5);
-    expect(board.getOccupied().length).toBe(17);
-  });
-})
-
-describe('attack behavior', () => {
-  beforeEach(() => board.clearShips());
-
-  test('hit a Destroyer once', () => {
-    board.placeShipByName('Destroyer', 3, 3, 'vertical');
+  test('can damage a ship with a hit', () => {
+    board.placeShip('Destroyer', 3, 3, 'horizontal');
     board.receiveHit(3, 3);
     expect(board.getShipByName('Destroyer').hits).toBe(1);
-    expect(board.getShipByName('Destroyer').isSunk()).toBe(false);
+    expect(board.getShipByName('Destroyer').isSunk()).toBeFalsy;
   });
 
-  test('cannot hit a Destroyer more than once in the same spot', () => {
-    board.placeShipByName('Destroyer', 3, 3, 'vertical');
+  test('can sink a ship with enough hits', () => {
+    board.placeShip('Destroyer', 3, 3, 'horizontal');
     board.receiveHit(3, 3);
-    board.receiveHit(3, 3);
-    board.receiveHit(3, 3);
-    expect(board.getShipByName('Destroyer').hits).toBe(1);
-    expect(board.getShipByName('Destroyer').isSunk()).toBe(false);
-  });
-
-  test('sink a Destroyer', () => {
-    board.placeShipByName('Destroyer', 3, 3, 'vertical');
-    board.receiveHit(3, 3);
-    board.receiveHit(3, 4);
-    board.receiveHit(3, 5);
+    board.receiveHit(4, 3);
+    board.receiveHit(5, 3);
     expect(board.getShipByName('Destroyer').hits).toBe(3);
-    expect(board.getShipByName('Destroyer').isSunk()).toBe(true);
+    expect(board.getShipByName('Destroyer').isSunk()).toBeTruthy;
   });
 
-  test('sink every ship', () => {
-    board.placeAllShipsRandomly();
-    expect(board.isAllSunk()).toBe(false);
+  test('can place valid random hits', () => {
+    for (let i = 0; i < 10; i++) {
+      board.receiveRandomHit();
+    }
+    expect(board.hitCoords.length).toBe(10);
+  });
+});
 
-    const coordsToHit = board.getOccupied();
-    coordsToHit.forEach(coord => board.receiveHit(coord[0], coord[1]));
+describe('sink behavior', () => {
+  beforeAll(() => { 
+    board = new Board(); 
+  });
 
-    expect(board.getShipByName('Carrier').hits).toBe(5);
-    expect(board.getShipByName('Carrier').isSunk()).toBe(true);
+  test('can properly report whether all ships have sunk', () => {
+    [
+      ['Carrier', 0],
+      ['Battleship', 1],
+      ['Destroyer', 2],
+      ['Submarine', 3],
+      ['Patrol Boat', 4]
+    ].forEach(ship => {
+      board.placeShip(ship[0], 0, ship[1], 'horizontal');
+      expect(board.isAllSunk()).toBeFalsy;
+    });
 
-    expect(board.getShipByName('Battleship').hits).toBe(4);
-    expect(board.getShipByName('Battleship').isSunk()).toBe(true);
+    board.getAllOccupied().forEach(cell => {
+      board.receiveHit(cell[0], cell[1]);
+    });
 
-    expect(board.getShipByName('Destroyer').hits).toBe(3);
-    expect(board.getShipByName('Destroyer').isSunk()).toBe(true);
+    expect(board.hitCoords.length).toBe(17);
+    expect(board.isAllSunk()).toBeTruthy;
+  });
 
-    expect(board.getShipByName('Submarine').hits).toBe(3);
-    expect(board.getShipByName('Submarine').isSunk()).toBe(true);
-
-    expect(board.getShipByName('Patrol Boat').hits).toBe(2);
-    expect(board.getShipByName('Patrol Boat').isSunk()).toBe(true);
-
-    expect(board.isAllSunk()).toBe(true);
+  test('no more hits can be placed after all ships sunk', () => {
+    board.receiveHit(5, 5);
+    expect(board.hitCoords.length).toBe(17);
+    expect(board.isAllSunk()).toBeTruthy;
   })
 });

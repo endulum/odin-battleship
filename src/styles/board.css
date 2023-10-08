@@ -100,7 +100,12 @@ header {
     color: var(--neutral);
   }
 
-  &.can-hit {
+  &.action {
+    background-color: var(--ship);
+    cursor: pointer;
+  }
+
+  /* &.can-hit {
     &:hover {
       background-color: var(--ship);
       cursor: pointer;
@@ -110,7 +115,7 @@ header {
   &.placement {
     background-color: var(--ship);
     cursor: pointer;
-  }
+  } */
 
   .fill-in {
     width: 100%;
@@ -148,6 +153,11 @@ header {
 .status {
   text-align: center;
   line-height: 1.25rem;
+}
+
+h2 {
+  font-size: 1.125rem;
+  margin-top: 0.5rem;
 }
 
 h3 {
